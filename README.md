@@ -39,7 +39,7 @@ $ ./finsta360 -h
 finsta360.py : to finalize incomplete MP4 of Insta360 ONE-X
 https://github.com/kichiki/finsta360
 USAGE: finsta360.py [options]
-    -s file : source file, that is, corrupted mp4 (insv) file
+	-s file : source file, that is, corrupted mp4 (insv) file
 	-r file : complete mp4 (insv) file as a reference
 	-o file : output recovered mp4 (insv) file
 	-v      : to set verbose mode
