@@ -19,8 +19,6 @@ I hope this would help some people suffering from the same situation.
 # How does it work?
 From (only and possibly incomplete) `mdat` data, this script regenerates the sample tables for H264 and AAC streams, and reconstructs `moov` with the help of reference `moov` from the complete MP4 from the same camera.
 
-That is, this script is for MP4 files encoded with H264 and AAC.
-
 Note that this script is only for Insta360 [ONE X](https://www.insta360.com/product/insta360-onex), but the technique is applicable to MP4 files with H264/AAC.
 
 # How to use?
