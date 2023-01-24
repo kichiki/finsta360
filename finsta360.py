@@ -10,7 +10,7 @@ import os.path
 import struct
 from datetime import datetime, timedelta
 import gc
-#from tqdm import tqdm
+from tqdm import tqdm
 
 
 # ## parsing mp4
@@ -279,7 +279,11 @@ def print_atom_headers(f, verbose=False, pre_label=''):
     buf = f.read(8)
 
     n = struct.unpack('>I', buf[:4])[0]
-    atom_type = str(buf[4:], 'utf-8')
+
+    try:
+        atom_type = str(buf[4:], 'utf-8')
+    except:
+        return (0, 'unknown')
 
     if n == 1:
         # decode 64-bit size
@@ -454,12 +458,13 @@ def recover_sample_tables_from_mdat_fast(filename, verbose=False):
         n = 0
         while True:
             cur = f_in.tell()
-            if cur >= mdat_end: break
+            if cur + 4 >= mdat_end: break
 
             buf = f_in.read(4)
 
             if buf[0] != 0xFF or buf[1] != 0xF1 or buf[2] != 0x4C or (buf[3] & 0b11111100) != 0x80:
                 # h264 chunk
+               
                 frame_length = struct.unpack('>I', buf)[0] + 4
                 if cur+frame_length >= mdat_end: break
 
@@ -580,7 +585,10 @@ def recover_moov_from_sample_tables(
         # the following is unchanged
         f_dst.write(buf[:16])
         #duration           = struct.unpack('>I', buf[16:20])[0]
-        f_dst.write(struct.pack('>I', mov_tkhd_duration))
+        if mov_tkhd_duration > 4294967295:
+            f_dst.write(struct.pack('>Q', mov_tkhd_duration))
+        else:
+            f_dst.write(struct.pack('>I', mov_tkhd_duration))
         # the rest is unchanged
         f_dst.write(buf[20:])
         #...
@@ -600,7 +608,10 @@ def recover_moov_from_sample_tables(
         # the following is unchanged
         f_dst.write(buf[:20])
         #duration           = struct.unpack('>I', buf[20:24])[0]
-        f_dst.write(struct.pack('>I', mov_tkhd_duration))
+        if mov_tkhd_duration > 4294967295:
+            f_dst.write(struct.pack('>Q', mov_tkhd_duration))
+        else:
+            f_dst.write(struct.pack('>I', mov_tkhd_duration))
         # the rest is unchanged
         f_dst.write(buf[24:])
         #...
@@ -619,7 +630,10 @@ def recover_moov_from_sample_tables(
         # the following is unchanged
         f_dst.write(buf[:16])
         #duration           = struct.unpack('>I', buf[16:20])[0]
-        f_dst.write(struct.pack('>I', mov_mdhd_duration))
+        if mov_tkhd_duration > 4294967295:
+            f_dst.write(struct.pack('>Q', mov_mdhd_duration))
+        else:
+            f_dst.write(struct.pack('>I', mov_mdhd_duration))
         # the rest is unchanged
         f_dst.write(buf[20:])
         #...
@@ -956,7 +970,7 @@ def finsta360(
 
 
 def usage():
-    print('finsta360.py : to finalize incomplete MP4 of Insta360 ONE-X
+    print('finsta360.py : to finalize incomplete MP4 of Insta360 ONE-X')
     print('https://github.com/kichiki/finsta360')
     print('USAGE: finsta360.py [options]')
     print('\t-s file : source file, that is, corrupted mp4 (insv) file')
